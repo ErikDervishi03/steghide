@@ -765,6 +765,16 @@ void BmpFile::readdata ()
 			paddinglength = 4 - (linelength % 4) ;
 		}
 
+    unsigned long long total_bytes_needed = (unsigned long long)height * (unsigned long long)linelength;
+
+    const unsigned long long MAX_ALLOWED_BYTES = 500ULL * 1024ULL * 1024ULL; 
+
+    if (total_bytes_needed > MAX_ALLOWED_BYTES) {
+        fprintf(stderr, "[!] SECURITY ERROR: BMP file requires %llu bytes, which exceeds the limit of %llu bytes.\n", total_bytes_needed, MAX_ALLOWED_BYTES);
+        fprintf(stderr, "[!] Execution aborted to prevent Memory Exhaustion/DoS.\n");
+        exit(1);
+    }
+
 		BitmapData.resize (height * linelength) ;
 		for (unsigned long line = 0 ; line < height ; line++) {
 			for (unsigned long posinline = 0 ; posinline < linelength ; posinline++) {
